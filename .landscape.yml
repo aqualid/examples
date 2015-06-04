@@ -1,0 +1,5 @@
+pep8:
+    full: true
+
+ignore-paths:
+    - tests
