@@ -28,7 +28,7 @@ def _run_cmd(cmd, path=None):
 def _run_example(core_dir, tools_dir, example_dir):
     tools_dir = os.path.join(tools_dir, 'tools')
 
-    cmd = ["python", "-c", "import aql;import sys;sys.exit(aql.main())", "-C", example_dir, "-I", tools_dir]
+    cmd = [sys.executable, "-c", "import aql;import sys;sys.exit(aql.main())", "-C", example_dir, "-I", tools_dir]
     _run_cmd(cmd, core_dir)
     _run_cmd(cmd + ['-R'], core_dir)
 
@@ -54,14 +54,12 @@ def run(core_dir, tools_dir, examples_dir):
 
 def main():
     examples_dir = os.path.abspath(os.path.dirname(__file__))
-    core_dir = "/home/me/work/src/aqualid/aqualid"
-    tools_dir = "/home/me/work/src/aqualid/tools"
 
-    # tools_dir = os.path.join(examples_dir, 'tools')
-    # core_dir = os.path.join(examples_dir, 'aqualid')
-    #
-    # _run_cmd(["git", "clone", "-b", "pytest", "--depth", "1", "https://github.com/aqualid/aqualid.git"])
-    # _run_cmd(["git", "clone", "-b", "pytest", "--depth", "1", "https://github.com/aqualid/tools.git"])
+    tools_dir = os.path.join(examples_dir, 'tools')
+    core_dir = os.path.join(examples_dir, 'aqualid')
+
+    _run_cmd(["git", "clone", "-b", "pytest", "--depth", "1", "https://github.com/aqualid/aqualid.git"])
+    _run_cmd(["git", "clone", "-b", "pytest", "--depth", "1", "https://github.com/aqualid/tools.git"])
 
     run(core_dir, tools_dir, examples_dir)
 
