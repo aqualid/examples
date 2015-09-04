@@ -58,8 +58,8 @@ def main():
     tools_dir = os.path.join(examples_dir, 'tools')
     core_dir = os.path.join(examples_dir, 'aqualid')
 
-    _run_cmd(["git", "clone", "-b", "pytest", "--depth", "1", "https://github.com/aqualid/aqualid.git"])
-    _run_cmd(["git", "clone", "-b", "pytest", "--depth", "1", "https://github.com/aqualid/tools.git"])
+    _run_cmd(["git", "clone", "-b", "master", "--depth", "1", "https://github.com/aqualid/aqualid.git"])
+    _run_cmd(["git", "clone", "-b", "master", "--depth", "1", "https://github.com/aqualid/tools.git"])
 
     run(core_dir, tools_dir, examples_dir)
 
