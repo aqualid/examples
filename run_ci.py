@@ -2,6 +2,7 @@
 
 import os
 import sys
+import argparse
 import subprocess
 
 
@@ -21,6 +22,19 @@ def _run_cmd(cmd, path=None):
 
     if result:
         sys.exit(result)
+
+
+# ==============================================================================
+def _fetch_repo(cur_dir, repo_name, repo_dir=None):
+    if repo_dir:
+        return os.path.abspath(repo_dir)
+
+    repo_dir = os.path.join(cur_dir, repo_name)
+
+    _run_cmd(["git", "clone", "-b", "master", "--depth", "1",
+              "https://github.com/aqualid/%s.git" % repo_name, repo_dir])
+
+    return repo_dir
 
 
 # ==============================================================================
@@ -51,15 +65,31 @@ def run(core_dir, tools_dir, examples_dir):
 
 
 # ==============================================================================
+def _parse_args():
+    args_parser = argparse.ArgumentParser()
+
+    args_parser.add_argument('--core-dir', action='store',
+                             dest='core_dir', metavar='PATH',
+                             help="Aqualid core directory. "
+                                  "By default it will be fetched from GitHub.")
+
+    args_parser.add_argument('--tools-dir', action='store',
+                             dest='tools_dir', metavar='PATH',
+                             help="Aqualid tools directory. "
+                                  "By default it will be fetched from GitHub.")
+
+    return args_parser.parse_args()
+
+
+# ==============================================================================
 
 def main():
+    args = _parse_args()
+
     examples_dir = os.path.abspath(os.path.dirname(__file__))
 
-    tools_dir = os.path.join(examples_dir, 'tools')
-    core_dir = os.path.join(examples_dir, 'aqualid')
-
-    _run_cmd(["git", "clone", "-b", "master", "--depth", "1", "https://github.com/aqualid/aqualid.git"])
-    _run_cmd(["git", "clone", "-b", "master", "--depth", "1", "https://github.com/aqualid/tools.git"])
+    core_dir = _fetch_repo(examples_dir, 'aqualid', args.core_dir)
+    tools_dir = _fetch_repo(examples_dir, 'tools', args.tools_dir)
 
     run(core_dir, tools_dir, examples_dir)
 
