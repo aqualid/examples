@@ -42,7 +42,8 @@ def _fetch_repo(cur_dir, repo_name, repo_dir=None):
 def _run_example(core_dir, tools_dir, example_dir):
     tools_dir = os.path.join(tools_dir, 'tools')
 
-    cmd = [sys.executable, "-c", "import aql;import sys;sys.exit(aql.main())", "-C", example_dir, "-I", tools_dir]
+    cmd = [sys.executable, "-c", "import aql;import sys;sys.exit(aql.main())",
+           "-C", example_dir, "-I", tools_dir]
     _run_cmd(cmd, core_dir)
     _run_cmd(cmd + ['-R'], core_dir)
 
