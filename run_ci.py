@@ -7,7 +7,7 @@ import subprocess
 
 
 # ==============================================================================
-def _run_cmd(cmd, path=None):
+def _run_cmd_status(cmd, path=None):
 
     if path:
         env = os.environ.copy()
@@ -18,10 +18,14 @@ def _run_cmd(cmd, path=None):
     print(cmd)
 
     p = subprocess.Popen(cmd, env=env, shell=False)
-    result = p.wait()
+    return p.wait()
 
-    if result:
-        sys.exit(result)
+
+# ==============================================================================
+def _run_cmd(cmd, path=None):
+    status = _run_cmd_status(cmd, path)
+    if status:
+        sys.exit(status)
 
 
 # ==============================================================================
@@ -31,25 +35,35 @@ def _fetch_repo(cur_dir, repo_name, repo_dir=None):
 
     repo_dir = os.path.join(cur_dir, repo_name)
 
-    _run_cmd(["git", "clone", "-b", "master", "--depth", "1",
-              "https://github.com/aqualid/%s.git" % repo_name, repo_dir])
+    default_branch = 'master'
+
+    branch = os.environ.get('TRAVIS_BRANCH')
+    if not branch:
+        branch = os.environ.get('APPVEYOR_REPO_BRANCH', default_branch)
+
+    cmd = ["git", "clone", "--depth", "1",
+           "https://github.com/aqualid/%s.git" % repo_name, repo_dir]
+
+    status = _run_cmd_status(cmd + ["-b", branch])
+    if status:
+        if branch == default_branch:
+            sys.exit(status)
+
+        _run_cmd(cmd + ["-b", default_branch])
 
     return repo_dir
 
 
 # ==============================================================================
+def _run_example(cmd, path, example_dir):
 
-def _run_example(core_dir, tools_dir, example_dir):
-    tools_dir = os.path.join(tools_dir, 'tools')
+    cmd = cmd + ["-C", example_dir]
 
-    cmd = [sys.executable, "-c", "import aql;import sys;sys.exit(aql.main())",
-           "-C", example_dir, "-I", tools_dir]
-    _run_cmd(cmd, core_dir)
-    _run_cmd(cmd + ['-R'], core_dir)
+    _run_cmd(cmd, path)
+    _run_cmd(cmd + ['-R'], path)
 
 
 # ==============================================================================
-
 def _get_examples(examples_dir):
     for item in os.listdir(examples_dir):
         example_dir = os.path.join(examples_dir, item)
@@ -59,10 +73,24 @@ def _get_examples(examples_dir):
 
 
 # ==============================================================================
-
 def run(core_dir, tools_dir, examples_dir):
+
+    tools_dir = os.path.join(tools_dir, 'tools')
+
+    cmd = [sys.executable,
+           "-c", "import aql;import sys;sys.exit(aql.main())",
+           "-I", tools_dir]
+
     for example_dir in _get_examples(examples_dir):
-        _run_example(core_dir, tools_dir, example_dir)
+        _run_example(cmd, core_dir, example_dir)
+
+
+# ==============================================================================
+def run_script(script, module_dir, examples_dir):
+    cmd = [sys.executable, script]
+
+    for example_dir in _get_examples(examples_dir):
+        _run_example(cmd, module_dir, example_dir)
 
 
 # ==============================================================================
