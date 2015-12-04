@@ -57,7 +57,7 @@ def _fetch_repo(cur_dir, repo_name, repo_dir=None):
 # ==============================================================================
 def _run_example(cmd, path, example_dir):
 
-    cmd = cmd + ["-C", example_dir]
+    cmd = cmd + ["-C", example_dir, '--bt']
 
     _run_cmd(cmd, path)
     _run_cmd(cmd + ['-R'], path)
